@@ -1,5 +1,24 @@
 import os
+import torch
+import soundfile as sf
+import torchaudio
+
 os.environ["COQUI_TOS_AGREED"] = "1"
+
+# torchaudio 2.6+ requires torchcodec which is not available on CPU/Windows.
+# Patch torchaudio.load to use soundfile backend instead.
+def _sf_load(path, frame_offset=0, num_frames=-1, normalize=True,
+             channels_first=True, **kwargs):
+    data, sr = sf.read(str(path), dtype='float32', always_2d=True)
+    tensor = torch.from_numpy(data.T if channels_first else data)
+    if frame_offset > 0:
+        tensor = tensor[..., frame_offset:]
+    if num_frames > 0:
+        tensor = tensor[..., :num_frames]
+    return tensor, sr
+
+torchaudio.load = _sf_load
+
 from TTS.api import TTS
 
 STYLE_REFS = {

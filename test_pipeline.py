@@ -4,9 +4,13 @@ Usage:
   python test_pipeline.py --video path/to/clip.mp4
   python test_pipeline.py --youtube "https://www.youtube.com/watch?v=..."
 
-If no argument given, downloads a 10-second CC-licensed test clip from archive.org.
+If no argument given, generates a short English clip using pyttsx3 (offline TTS).
 """
 import sys, os, argparse
+
+# Force UTF-8 so Devanagari (Hindi) text can be printed on Windows terminals
+sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
