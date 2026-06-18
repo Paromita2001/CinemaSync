@@ -1,0 +1,65 @@
+========================================
+CineSync — Dataset Download Guide
+========================================
+
+You need to download these 3 datasets manually.
+After downloading, unzip them into the paths shown below.
+
+------------------------------------------------------------
+1. RAVDESS (Emotion Audio Dataset)
+------------------------------------------------------------
+Purpose : Train the emotion detector (angry, happy, sad, etc.)
+Size    : ~750 MB
+URL     : https://zenodo.org/record/1188976
+File    : Audio_Speech_Actors_01-24.zip
+
+Steps:
+  1. Go to the URL above
+  2. Download "Audio_Speech_Actors_01-24.zip"
+  3. Unzip into:  data/ravdess/
+
+Expected structure after unzip:
+  data/ravdess/Actor_01/
+  data/ravdess/Actor_02/
+  ...
+  data/ravdess/Actor_24/
+
+------------------------------------------------------------
+2. CREMA-D (Emotion Audio Dataset)
+------------------------------------------------------------
+Purpose : More emotion training data (combines with RAVDESS)
+Size    : ~2 GB
+URL     : https://github.com/CheyneyComputerScience/CREMA-D
+
+Steps:
+  Option A (git):
+    git clone https://github.com/CheyneyComputerScience/CREMA-D data/crema_d
+
+  Option B (manual):
+    Go to the URL, download AudioWAV.zip
+    Unzip into: data/crema_d/
+
+------------------------------------------------------------
+3. IIT Bombay English-Hindi Corpus (Translation Dataset)
+------------------------------------------------------------
+Purpose : Train the English-to-Hindi translation model
+Size    : ~500 MB
+URL     : http://www.cfilt.iitb.ac.in/iitb_parallel/
+
+Steps:
+  1. Go to the URL above
+  2. Download "iitb.en-hi.tar.gz"
+  3. Extract into: data/iitb_corpus/
+
+Expected files after extract:
+  data/iitb_corpus/IITB.en-hi.en    (English sentences)
+  data/iitb_corpus/IITB.en-hi.hi    (Hindi sentences)
+
+------------------------------------------------------------
+IMPORTANT NOTE
+------------------------------------------------------------
+You do NOT need these datasets for Phase 1.
+They are needed starting Phase 2 (model training).
+
+Phase 1 is COMPLETE once test_install.py shows all checks passing.
+========================================

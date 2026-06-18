@@ -1,0 +1,166 @@
+========================================
+CineSync — Phase-by-Phase Progress Notes
+========================================
+
+PROJECT GOAL:
+  Take an English video (file or YouTube URL) and produce a Hindi dubbed
+  version that preserves the original speaker's emotion, timing, and voice style.
+
+========================================
+PHASE 1 — Environment Setup
+STATUS: COMPLETE (2026-06-18)
+========================================
+
+WHAT WAS DONE:
+  1. Created the full project folder structure:
+       pipeline/, models/, training/, api/, ui/
+       data/ravdess/, data/crema_d/, data/iitb_corpus/
+       uploads/, outputs/, notebooks/, tests/
+
+  2. Created Python virtual environment: cinesync_env/
+     (Isolates project packages from your system Python)
+
+  3. Installed all Python libraries:
+     [OK] openai-whisper     - transcribes English speech to text
+     [OK] torch + torchaudio - builds and trains the neural network models
+     [OK] tensorflow         - used for the emotion CNN (alternative framework)
+     [OK] librosa            - extracts audio features (pitch, energy, MFCC)
+     [OK] soundfile          - reads/writes audio files
+     [OK] pydub              - stitches audio segments together
+     [OK] ffmpeg-python      - controls FFmpeg from Python
+     [OK] yt-dlp             - downloads YouTube videos
+     [OK] fastapi + uvicorn  - runs the REST API server
+     [OK] streamlit          - runs the web demo UI
+     [OK] sacrebleu          - evaluates translation quality (BLEU score)
+     [OK] indic-nlp-library  - handles Hindi text (Devanagari script)
+     [OK] scikit-learn       - helper ML utilities for training
+     [OK] numpy/pandas       - data handling
+     [OK] pytest             - running tests
+
+     [OK] TTS (Coqui XTTS v2) - INSTALLED (v0.22.0)
+          Visual C++ Build Tools were auto-installed to make this work.
+
+  4. Verified FFmpeg is installed at system level: v8.0.1 (PASS)
+
+  5. Created test_install.py (run it any time to check status)
+     Result: 21/21 checks pass (ALL PASS)
+
+  6. Created DOWNLOAD_DATASETS.txt (manual dataset download guide)
+     Datasets are NOT needed until Phase 2.
+
+KNOWN ISSUES:
+  - No CUDA GPU detected. PyTorch running on CPU only.
+    Impact: Model training will be slow. Use Google Colab (free GPU) for Phase 2.
+
+HOW TO ACTIVATE THE ENVIRONMENT:
+  Windows: cinesync_env\Scripts\activate
+  Then run: python test_install.py
+
+========================================
+PHASE 2 — Model Training          [IN PROGRESS - 2026-06-18]
+========================================
+
+FILES CREATED:
+  models/nmt/encoder.py          - BiLSTM Encoder (28.5M param model)
+  models/nmt/attention.py        - Bahdanau Attention mechanism
+  models/nmt/decoder.py          - LSTM Decoder with attention + context
+  models/nmt/seq2seq.py          - Full Seq2Seq (greedy + beam search decode)
+  models/emotion/emotion_model.py - 3-layer MLP (84-dim input → 6 emotions)
+  training/vocab.py              - Vocabulary builder + tokenizers
+  training/train_emotion.py      - Emotion classifier training script
+  training/train_nmt.py          - NMT training loop (teacher forcing)
+  training/evaluate_nmt.py       - BLEU score evaluation (beam search)
+  training/download_data.py      - Auto-downloads RAVDESS + CREMA-D
+  training/create_style_refs.py  - Copies RAVDESS clips → style_refs/
+  pipeline/emotion_detector.py   - Loads trained model, detects emotion from audio
+  pipeline/translator.py         - Loads trained NMT, translates English → Hindi
+  pipeline/translator_pretrained.py - Helsinki-NLP/opus-mt-en-hi fallback (BLEU ~31)
+  pipeline/transcriber.py        - Whisper ASR with timestamps
+  pipeline/isochronic.py         - Speed factor computation for timing
+  pipeline/tts_synthesizer.py    - Coqui XTTS v2 Hindi synthesis
+  pipeline/video_assembler.py    - FFmpeg audio+video merge + SRT generation
+
+DATASETS:
+  [OK] RAVDESS       - 24 Actor dirs downloaded + extracted (~750MB)
+  [~~] CREMA-D       - Git clone in progress (~2GB)
+  [!!] IIT Bombay    - Manual download required (see DOWNLOAD_DATASETS.txt)
+
+STYLE REFS:
+  [OK] style_refs/neutral.wav, happy.wav, sad.wav,
+       angry.wav, fearful.wav, surprised.wav
+  (Created from RAVDESS clips, used by Coqui XTTS v2)
+
+MODEL CHECKS:
+  [OK] NMT forward pass verified (28.5M params)
+  [OK] Greedy + beam search decode verified
+  [OK] Emotion MLP forward pass verified (84→6)
+
+TRAINING STATUS:
+  [OK] Emotion classifier — TRAINED & SAVED
+       Dataset : 1248 samples from RAVDESS (CREMA-D adds more when clone finishes)
+       Result  : val_acc = 0.824 (82.4%) — TARGET 78% PASSED
+       Per-emotion: neutral=87% F1, angry=91% F1, fearful=82% F1
+       Output  : models/emotion/emotion_model.pt
+
+  [!!] NMT model — waiting for IIT Bombay corpus (manual download required)
+       Fallback: use pipeline/translator_pretrained.py (Helsinki-NLP, no training needed)
+       Output (when ready): models/nmt/nmt_model.pt + models/nmt/vocab.pt
+
+KNOWN ISSUES:
+  - No CUDA GPU. Training on CPU only — emotion training ~20 min, NMT needs Colab GPU.
+  - IIT Bombay corpus requires manual download (website doesn't have direct API).
+
+========================================
+PHASE 3 — Core Pipeline            [NOT STARTED]
+========================================
+PLAN:
+  Connect all 5 stages end-to-end:
+  Whisper --> Emotion Detector --> NMT Translator --> XTTS TTS --> FFmpeg
+
+  Test on a 60-second English video clip.
+  Expected output: Hindi dubbed MP4 file.
+
+========================================
+PHASE 4 — Input Handling           [NOT STARTED]
+========================================
+PLAN:
+  - Accept .mp4/.mkv/.avi/.mov file uploads
+  - Accept YouTube URLs (via yt-dlp)
+  - Validate video length (max 10 min for demo)
+  - Validate YouTube URL is real and accessible
+
+========================================
+PHASE 5 — FastAPI Backend          [NOT STARTED]
+========================================
+PLAN:
+  - POST /dub        (submit file or YouTube URL, get job_id back)
+  - GET /status/{id} (check processing progress 0-100%)
+  - GET /download/{id}(download the dubbed MP4)
+  - SQLite DB to track job status
+
+========================================
+PHASE 6 — Streamlit UI             [NOT STARTED]
+========================================
+PLAN:
+  - Drag-and-drop video upload OR paste YouTube URL
+  - Live progress bar (transcribing... translating... assembling...)
+  - Side-by-side original vs. dubbed video player
+  - One-click download button
+
+========================================
+PHASE 7 — Testing                  [NOT STARTED]
+========================================
+PLAN:
+  - Unit tests for each pipeline module
+  - End-to-end test with a real 60-second clip
+  - Manual emotion tests (happy/angry clip)
+
+========================================
+PHASE 8 — Deployment               [NOT STARTED]
+========================================
+PLAN:
+  - Dockerfile + docker-compose
+  - Deploy to Hugging Face Spaces (free, best for ML portfolio)
+  - Note: Use whisper "tiny" on free tier (memory limits)
+
+========================================

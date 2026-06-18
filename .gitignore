@@ -1,0 +1,44 @@
+# Virtual environment
+cinesync_env/
+
+# Datasets — large, download via training/download_data.py
+data/ravdess/
+data/crema_d/
+data/iitb_corpus/
+
+# Generated model weights — train locally
+models/nmt/nmt_model.pt
+models/emotion/emotion_model.pt
+models/nmt/vocab.pt
+
+# Style reference WAVs — generated via training/create_style_refs.py
+style_refs/
+
+# Runtime directories
+uploads/
+outputs/
+
+# SQLite job tracking DB
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment files
+.env
+.env.*
+
+# Video/audio artifacts
+*.mp4
+*.wav
+*.mp3
+
+# OS
+.DS_Store
+Thumbs.db

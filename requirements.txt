@@ -1,0 +1,41 @@
+# Core AI/ML
+openai-whisper
+torch
+torchaudio
+tensorflow
+TTS
+
+# Audio processing
+librosa
+soundfile
+pydub
+
+# Video processing
+ffmpeg-python
+yt-dlp
+
+# NLP / Translation
+indic-nlp-library
+sacrebleu
+
+# API
+fastapi
+uvicorn[standard]
+celery
+redis
+python-multipart
+aiofiles
+
+# Data science
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+
+# UI
+streamlit
+plotly
+
+# Testing
+pytest
