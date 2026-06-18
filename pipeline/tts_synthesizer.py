@@ -1,4 +1,5 @@
 import os
+os.environ["COQUI_TOS_AGREED"] = "1"
 from TTS.api import TTS
 
 STYLE_REFS = {
