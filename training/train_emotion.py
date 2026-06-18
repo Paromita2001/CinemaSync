@@ -162,7 +162,14 @@ def train():
     model     = EmotionMLP().to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=LR, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=5, factor=0.5)
-    criterion = nn.CrossEntropyLoss()
+
+    # Class weights — inverse frequency so rare classes aren't ignored
+    total_n = sum(counts.values())
+    class_weights = torch.tensor(
+        [total_n / (len(EMOTIONS) * counts.get(i, 1)) for i in range(len(EMOTIONS))],
+        dtype=torch.float32
+    ).to(DEVICE)
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
 
     best_acc = 0.0
     print(f"\nTraining on {DEVICE}...\n")
